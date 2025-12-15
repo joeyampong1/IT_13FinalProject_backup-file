@@ -195,7 +195,7 @@
 
 @code {
     [Parameter]
-    public string? PatientId { get; set; }
+    public int patientId { get; set; }
 
     private VitalSign? vitalSign;
     private bool IsLoading = true;
@@ -215,13 +215,8 @@
             StateHasChanged();
 
             // Get patient ID from parameter or query string
-            int patientId = 0;
-            if (!string.IsNullOrEmpty(PatientId))
-            {
-                patientId = int.Parse(PatientId);
-                Console.WriteLine($"Patient ID from parameter: {patientId}");
-            }
-            else
+            int patientId = this.patientId;
+            if (patientId == 0)
             {
                 // Try to get from query string
                 var uri = new Uri(Navigation.Uri);

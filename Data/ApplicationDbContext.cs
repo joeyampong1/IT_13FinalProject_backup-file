@@ -15,6 +15,7 @@ namespace IT_13FinalProject.Data
         public DbSet<VitalSign> VitalSigns { get; set; } = null!;
         public DbSet<PharmacyInventory> PharmacyInventory { get; set; } = null!;
         public DbSet<PatientBill> PatientBills { get; set; } = null!;
+        public DbSet<NurseNote> NurseNotes { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
