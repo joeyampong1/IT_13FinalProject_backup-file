@@ -99,6 +99,24 @@
     border: 1px solid #0f8b8d;
     background: #ffffff;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.admin-app-select:checked {
+    background-color: #0f8b8d;
+    border-color: #0f8b8d;
+    color: #ffffff;
+}
+
+.admin-app-select:checked::after {
+    content: "\2713";
+    font-size: 12px;
+    line-height: 1;
 }
 
 .admin-company-name {
@@ -106,15 +124,16 @@
 }
 
 .admin-company-send {
-    width: 32px;
-    height: 32px;
+    padding: 4px 6px !important;  /* force narrow horizontal padding */
     border-radius: 8px;
     border: 1px solid #0f8b8d;
     background-color: #ffffff;
-    display: flex;
+    display: inline-flex;  /* shrink to fit icon */
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    width: auto;
+    min-width: 0;
 }
 
 .admin-company-send-icon {
@@ -309,7 +328,7 @@
 }
 
 .inv-row-col-action {
-    align-items: flex-start;
+    align-items: flex-end;
     justify-content: center;
 }
 
@@ -353,18 +372,23 @@
     background-color: #e9f6f5;
 }
 
-.inv-decision-buttons {
-    display: inline-flex;  /* shrink to content so X and ✓ stay close to the eye */
-    align-items: center;
-    justify-content: flex-start;
-    gap: 2px;
+ .inv-decision-buttons {
+    display: inline-flex;        /* lay out Reject, Accept, View side by side */
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 4px;                    /* small equal spacing between the three groups */
+    flex-wrap: nowrap;           /* keep all three groups on one horizontal line */
 }
+
+/* .inv-decision-label-row and .inv-decision-icons were removed as unused
+   to avoid empty ruleset lint warnings. */
 
 .inv-decision-group {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
+    min-width: 52px;  /* keep Reject, Accept, View stacks same width on every row */
 }
 
 .inv-decision-label {
@@ -373,19 +397,28 @@
 }
 
 .inv-decision-btn {
-    border: none;
-    background: transparent;
+    min-width: 26px;
+    height: auto;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid transparent; /* color set per state (reject/accept) */
+    background-color: #ffffff;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
     line-height: 1;
 }
 
 .inv-decision-reject {
     color: #e55353;
+    border-color: #e55353;
 }
 
 .inv-decision-accept {
     color: #3bb273;
+    border-color: #3bb273;
 }
 
 .inv-reject-overlay {

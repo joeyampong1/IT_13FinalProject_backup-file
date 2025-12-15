@@ -81,10 +81,6 @@
                             </div>
                             <div class="inv-row-col inv-row-col-action">
                                 <div class="inv-decision-buttons">
-                                    <button class="inv-view-btn" type="button" aria-label="View details" @onclick="() => OpenViewPanel(item)">
-                                        <span class="inv-view-icon"></span>
-                                    </button>
-
                                     <div class="inv-decision-group">
                                         <span class="inv-decision-label">Reject</span>
                                         <button class="inv-decision-btn inv-decision-reject" type="button" aria-label="Reject request" @onclick="() => OpenRejectionPanel(item)">
@@ -96,6 +92,13 @@
                                         <span class="inv-decision-label">Accept</span>
                                         <button class="inv-decision-btn inv-decision-accept" type="button" aria-label="Accept request" @onclick="() => OpenAcceptConfirm(item)">
                                             ✓
+                                        </button>
+                                    </div>
+
+                                    <div class="inv-decision-group">
+                                        <span class="inv-decision-label">View</span>
+                                        <button class="inv-view-btn" type="button" aria-label="View details" @onclick="() => OpenViewPanel(item)">
+                                            <span class="inv-view-icon"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -121,10 +124,6 @@
                             </div>
                             <div class="inv-row-col inv-row-col-action">
                                 <div class="inv-decision-buttons">
-                                    <button class="inv-view-btn" type="button" aria-label="View details" @onclick="() => OpenViewPanel(item)">
-                                        <span class="inv-view-icon"></span>
-                                    </button>
-
                                     <div class="inv-decision-group">
                                         <span class="inv-decision-label">Reject</span>
                                         <button class="inv-decision-btn inv-decision-reject" type="button" aria-label="Reject request" @onclick="() => OpenRejectionPanel(item)">
@@ -136,6 +135,13 @@
                                         <span class="inv-decision-label">Accept</span>
                                         <button class="inv-decision-btn inv-decision-accept" type="button" aria-label="Accept request" @onclick="() => OpenAcceptConfirm(item)">
                                             ✓
+                                        </button>
+                                    </div>
+
+                                    <div class="inv-decision-group">
+                                        <span class="inv-decision-label">View</span>
+                                        <button class="inv-view-btn" type="button" aria-label="View details" @onclick="() => OpenViewPanel(item)">
+                                            <span class="inv-view-icon"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -163,7 +169,7 @@
                                     <span class="admin-app-label">Name</span>
                                     <span class="admin-app-value">@name</span>
                                 </div>
-                                <button type="button" class="admin-app-select" aria-label="Select application" @onclick="() => SelectApplication(name)"></button>
+                                <input type="checkbox" class="admin-app-select" aria-label="Select application" @onchange="() => SelectApplication(name)" />
                             </div>
                         }
                     </div>
