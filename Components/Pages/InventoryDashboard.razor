@@ -18,43 +18,19 @@
         </div>
     </header>
 
-    @if (IsNotificationDismissed)
-    {
-        <div class="dashboard-notification-toggle" @onclick="ShowNotificationBar">
-            <span class="notification-toggle-icon">▾</span>
-        </div>
-    }
-
-    @if (!IsNotificationDismissed)
-    {
-        <section class="dashboard-notification">
-            <div class="notification-header-row">
-                <div class="notification-title">Lease Notification</div>
-                <div class="notification-controls">
-                    @if (IsNotificationCollapsed)
-                    {
-                        <span class="notification-control-icon" @onclick="ShowNotification">▢</span>
-                    }
-                    else
-                    {
-                        <span class="notification-control-icon" @onclick="HideNotification">▭</span>
-                    }
-                    <span class="notification-control-icon" @onclick="ExitNotification">✕</span>
-                </div>
+    <!-- SEARCH ROW -->
+    <section class="search-row">
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon"></span>
+                <input class="search-input" placeholder="Search inventory items..." />
             </div>
-
-            @if (!IsNotificationCollapsed)
-            {
-                <div class="notification-body">
-                    <div class="notification-icon">!</div>
-                    <div class="notification-text">
-                        <div>Low stock alert: Paracetamol 500mg is below reorder level.</div>
-                        <button class="notification-button" @onclick="GoToNotification">Go to notification</button>
-                    </div>
-                </div>
-            }
-        </section>
-    }
+            <div class="search-actions">
+                <button class="action-btn">Sort</button>
+                <button class="action-btn">Filters</button>
+            </div>
+        </div>
+    </section>
 
     <!-- TOP STAT CARDS -->
     <section class="stats-cards-row">
@@ -186,8 +162,6 @@
 </div>
 
 @code {
-    [Inject]
-    private NavigationManager Navigation { get; set; } = default!;
     private bool IsNotificationCollapsed { get; set; }
     private bool IsNotificationDismissed { get; set; }
 
@@ -211,10 +185,5 @@
     {
         IsNotificationDismissed = false;
         IsNotificationCollapsed = false;
-    }
-
-    private void GoToNotification()
-    {
-        Navigation.NavigateTo("/notification?role=inventory");
     }
 }

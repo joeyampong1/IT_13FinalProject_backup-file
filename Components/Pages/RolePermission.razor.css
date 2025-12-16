@@ -73,7 +73,7 @@
 
     .section-title i {
         font-size: 20px;
-        color: #40b6ae;
+        color: #3b82f6;
     }
 
     .section-title h2 {
@@ -108,7 +108,7 @@
     }
 
     .role-card.active {
-        border-color: #40b6ae;
+        border-color: #3b82f6;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
@@ -122,12 +122,6 @@
     color: white;
     font-size: 24px;
     margin-bottom: 16px;
-}
-
-.role-icon-svg {
-    width: 24px;
-    height: 24px;
-    display: block;
 }
 
     .role-icon.admin {
@@ -284,7 +278,7 @@
 
 .role-badge {
     background-color: #dbeafe;
-    color: #1b7471;
+    color: #1e40af;
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 12px;
@@ -328,9 +322,8 @@
         width: 16px;
         height: 16px;
         cursor: pointer;
-        accent-color: #40b6ae;
+        accent-color: #3b82f6;
     }
-
 
     .permission-checkbox span {
         user-select: none;
@@ -368,14 +361,14 @@
     }
 
 .btn-save {
-    background-color: #40b6ae;
+    background-color: #3b82f6;
     color: white;
-    border: 1px solid #40b6ae;
+    border: 1px solid #3b82f6;
 }
 
     .btn-save:hover {
-        background-color: #359a92;
-        border-color: #359a92;
+        background-color: #2563eb;
+        border-color: #2563eb;
     }
 
 /* Responsive Design */

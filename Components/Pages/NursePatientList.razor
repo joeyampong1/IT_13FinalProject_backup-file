@@ -7,7 +7,6 @@
 @inject ApplicationDbContext DbContext
 @inject LocalDbContext LocalDbContext
 @inject NavigationManager Navigation
-@inject IJSRuntime JsRuntime
 
 <div class="pm-page">
     <header class="dashboard-header">
@@ -38,11 +37,6 @@
         </div>
 
         <div class="pm-filters-row">
-            <div class="pm-tab-container">
-                <button class="pm-tab-btn @(ActiveTab == PatientTab.New ? "active" : "")" @onclick="() => SetTab(PatientTab.New)">New</button>
-                <button class="pm-tab-btn @(ActiveTab == PatientTab.Assisted ? "active" : "")" @onclick="() => SetTab(PatientTab.Assisted)">Assisted</button>
-                <button class="pm-tab-btn @(ActiveTab == PatientTab.Archive ? "active" : "")" @onclick="() => SetTab(PatientTab.Archive)">Archive</button>
-            </div>
             <div class="pm-search-row">
                 <div class="pm-search-box">
                     <span class="pm-search-icon"></span>
@@ -66,21 +60,12 @@
                             <th>Assessment Status</th>
                             <th class="pm-col-date">Date of Visit</th>
                             <th class="pm-col-action">Patient Info</th>
+                            <th class="pm-col-vitals">Vital Sign Monitoring</th>
                             <th class="pm-col-archive">Archive</th>
-                            <th class="pm-col-vitals">
-                                @if (ActiveTab == PatientTab.Assisted)
-                                {
-                                    <span>Add to Nurse Note</span>
-                                }
-                                else
-                                {
-                                    <span>Vital Sign<br />Monitoring</span>
-                                }
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var p in ActiveLetter.HasValue ? GetOrderedPatients(ActiveLetter.Value) : FilteredPatients)
+                        @foreach (var p in ActiveLetter.HasValue ? GetOrderedPatients(ActiveLetter.Value) : Patients)
                         {
                             <tr>
                                 <td class="pm-col-name">
@@ -89,41 +74,18 @@
                                 <td class="pm-col-email">
                                     <div class="pm-patient-email">@p.Email</div>
                                 </td>
-                                <td>@(ActiveTab == PatientTab.Archive ? "Archived" : (ActiveTab == PatientTab.Assisted ? "Assisted" : "New Patient"))</td>
+                                <td>New Patient</td>
                                 <td class="pm-col-date">@(p.CreatedAt?.ToString("MM/dd/yy") ?? "Unknown")</td>
                                 <td class="pm-col-action">
                                     <button class="pm-view-btn" aria-label="View patient record" @onclick="() => GoToPatientProfile(p.PatientId.ToString())">
                                         <span class="pm-view-icon"></span>
                                     </button>
                                 </td>
-                                <td class="pm-col-archive">
-                                    @if (ActiveTab == PatientTab.Archive)
-                                    {
-                                        <button class="pm-restore-btn" @onclick="() => RestorePatient(p.PatientId)" title="Restore Patient">
-                                            <span class="pm-restore-icon" aria-hidden="true"></span>
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button class="pm-archive-btn" @onclick="() => ArchivePatient(p.PatientId)" title="Archive Patient">
-                                            <span class="pm-archive-icon" aria-hidden="true"></span>
-                                        </button>
-                                    }
-                                </td>
                                 <td class="pm-col-vitals">
-                                    @if (ActiveTab == PatientTab.New)
-                                    {
-                                        <button class="pm-add-btn" @onclick="() => GoToVitalsForm(p.PatientId.ToString())">+ Add</button>
-                                    }
-                                    else if (ActiveTab == PatientTab.Assisted)
-                                    {
-                                        @if (!HasNurseNote(p.PatientId))
-                                        {
-                                            <button class="pm-nurse-note-btn" title="Add to Nurse Note" aria-label="Add to Nurse Note" @onclick="() => GoToNurseNotesAdd(p.PatientId)">
-                                                <span class="pm-nurse-note-icon" aria-hidden="true"></span>
-                                            </button>
-                                        }
-                                    }
+                                    <button class="pm-add-btn" @onclick="() => GoToVitalsForm(p.PatientId.ToString())">+ Add</button>
+                                </td>
+                                <td class="pm-col-archive">
+                                    <button class="pm-archive-btn" @onclick="() => ArchivePatient(p.PatientId)">Archive</button>
                                 </td>
                             </tr>
                         }
@@ -148,18 +110,7 @@
     private bool ShowPagination { get; set; } = true;
     private bool ShowLetters { get; set; } = false;
     private char? ActiveLetter { get; set; }
-
-    private enum PatientTab
-    {
-        New,
-        Assisted,
-        Archive
-    }
-
-    private PatientTab ActiveTab { get; set; } = PatientTab.New;
-
-    private List<int> VitalCompletedPatientIds { get; set; } = new();
-
+    
     private readonly char[] Alphabet =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -167,100 +118,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Navigation.LocationChanged += HandleLocationChanged;
         await LoadPatients();
-        await LoadNoteLockedPatientIdsAsync();
-    }
-
-    public void Dispose()
-    {
-        Navigation.LocationChanged -= HandleLocationChanged;
-    }
-
-    private async void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
-    {
-        try
-        {
-            await InvokeAsync(async () =>
-            {
-                await LoadNoteLockedPatientIdsAsync();
-                StateHasChanged();
-            });
-        }
-        catch
-        {
-        }
-    }
-
-    private HashSet<int> NoteLockedPatientIds { get; set; } = new();
-
-    private async Task LoadNoteLockedPatientIdsAsync()
-    {
-        try
-        {
-            var ids = await JsRuntime.InvokeAsync<string>("nurseNotes.getNoteLockedPatientIds");
-            if (string.IsNullOrWhiteSpace(ids))
-            {
-                NoteLockedPatientIds = new();
-                return;
-            }
-
-            NoteLockedPatientIds = ids
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(s => int.TryParse(s, out var v) ? v : 0)
-                .Where(v => v > 0)
-                .ToHashSet();
-        }
-        catch
-        {
-            NoteLockedPatientIds = new();
-        }
-    }
-
-    private bool HasNurseNote(int patientId)
-    {
-        return NoteLockedPatientIds.Contains(patientId);
-    }
-
-    private async Task SetTab(PatientTab tab)
-    {
-        ActiveTab = tab;
-        await LoadPatients();
-        await LoadNoteLockedPatientIdsAsync();
     }
 
     private async Task LoadPatients()
     {
         try
         {
-            var query = DbContext.Patients.AsQueryable();
-
-            if (ActiveTab == PatientTab.Archive)
-            {
-                query = query.Where(p => p.IsArchived.HasValue && p.IsArchived.Value);
-            }
-            else
-            {
-                query = query.Where(p => !p.IsArchived.HasValue || !p.IsArchived.Value);
-            }
-
-            Patients = await query
+            Patients = await DbContext.Patients
+                .Where(p => !p.IsArchived.HasValue || !p.IsArchived.Value) // Only load non-archived patients
                 .OrderBy(p => p.LastName)
                 .ThenBy(p => p.FirstName)
                 .ToListAsync();
-
-            if (ActiveTab != PatientTab.Archive)
-            {
-                VitalCompletedPatientIds = await DbContext.VitalSigns
-                    .Where(v => v.IsArchived == false)
-                    .Select(v => v.PatientId)
-                    .Distinct()
-                    .ToListAsync();
-            }
-            else
-            {
-                VitalCompletedPatientIds = new List<int>();
-            }
             
             Console.WriteLine($"Loaded {Patients.Count} active patients");
             foreach (var p in Patients.Take(3))
@@ -278,32 +147,18 @@
     {
         if (string.IsNullOrEmpty(letter.ToString()))
         {
-            return FilteredPatients;
+            return Patients;
         }
 
         var upper = letter.ToString().ToUpper();
 
-        var startsWithLetter = FilteredPatients
+        var startsWithLetter = Patients
             .Where(p => (p.FirstName + " " + p.LastName).StartsWith(upper, StringComparison.OrdinalIgnoreCase));
 
-        var others = FilteredPatients
+        var others = Patients
             .Where(p => !(p.FirstName + " " + p.LastName).StartsWith(upper, StringComparison.OrdinalIgnoreCase));
 
         return startsWithLetter.Concat(others);
-    }
-
-    private IEnumerable<Patient> FilteredPatients
-    {
-        get
-        {
-            if (ActiveTab == PatientTab.Archive)
-                return Patients;
-
-            if (ActiveTab == PatientTab.New)
-                return Patients.Where(p => !VitalCompletedPatientIds.Contains(p.PatientId));
-
-            return Patients.Where(p => VitalCompletedPatientIds.Contains(p.PatientId));
-        }
     }
 
     private void TogglePagination()
@@ -326,11 +181,6 @@
         {
             Navigation.NavigateTo("/nurse-vitals");
         }
-    }
-
-    private void GoToNurseNotesAdd(int patientId)
-    {
-        Navigation.NavigateTo($"/nurse-notes?openAdd=1&patientId={patientId}");
     }
 
     private async Task ArchivePatient(int patientId)
@@ -380,39 +230,14 @@
         }
     }
 
-    private async Task RestorePatient(int patientId)
-    {
-        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to restore this patient?");
-
-        if (!confirmed)
-        {
-            return;
-        }
-
-        try
-        {
-            var patient = await DbContext.Patients.FindAsync(patientId);
-            if (patient != null)
-            {
-                patient.IsArchived = false;
-                patient.ArchivedAt = null;
-                await DbContext.SaveChangesAsync();
-
-                await LoadPatients();
-                await JsRuntime.InvokeVoidAsync("alert", "Patient restored successfully!");
-            }
-        }
-        catch (Exception ex)
-        {
-            await JsRuntime.InvokeVoidAsync("alert", $"Error restoring patient: {ex.Message}");
-        }
-    }
-
     private void SelectLetter(char letter)
     {
         ShowLetters = true;
         ActiveLetter = letter;
     }
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
 }
 
 

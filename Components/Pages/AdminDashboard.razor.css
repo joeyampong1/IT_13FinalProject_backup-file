@@ -11,13 +11,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
-    margin: -10px -16px 6px;
-    background-color: #f3faf9;
-    border-bottom: 1px solid #e0f0ee;
-    position: sticky;
-    top: 0;
-    z-index: 5;
+    padding: 0;
+    margin: 0 0 24px 0;
+    background-color: transparent;
+    border-bottom: none;
+    position: relative;
 }
 
 .dashboard-notification-toggle {
@@ -44,7 +42,7 @@
 }
 
 .dashboard-title {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     margin: 0;
     color: #1e293b;
@@ -52,7 +50,7 @@
 
 .dashboard-subtitle {
     margin: 4px 0 0;
-    font-size: 14px;
+    font-size: 16px;
     color: #64748b;
 }
 
@@ -252,7 +250,7 @@
     flex: 1;
     min-width: 3px;
     border-radius: 2px 2px 0 0;
-    background: linear-gradient(180deg, #00907f, #1e40af);
+    background: linear-gradient(180deg, #3b82f6, #1e40af);
 }
 
 .dashboard-no-notification .card-placeholder {
@@ -681,7 +679,7 @@
 }
 
 .page-number.active {
-    background-color: #0f8b8d;
+    background-color: #3b82f6;
     color: #ffffff;
 }
 
